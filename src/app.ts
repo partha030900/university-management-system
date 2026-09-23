@@ -2,6 +2,7 @@ import express, { type Application, type Request, type Response } from "express"
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { resultRoutes } from "./modules/result/result.route.js";
+import { registrationRoutes } from "./modules/registration/registration.route.js";
 
 
 const app: Application = express();
@@ -19,6 +20,8 @@ app.get("/api/v1/health", (req: Request, res: Response) => {
 });
 
 app.use("/api/v1/results", resultRoutes);
+
+app.use("/api/v1/registrations", registrationRoutes);
 
 
 
