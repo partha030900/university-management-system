@@ -1,0 +1,18 @@
+model Result {
+  id             Int          @id @default(autoincrement())
+
+  registrationId Int
+  registration   Registration @relation(fields: [registrationId], references: [id])
+
+  examId         Int
+  exam           Exam         @relation(fields: [examId], references: [id])
+
+  marks          Float
+  grade          Grade
+
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([registrationId, examId])
+  @@map("results")
+}

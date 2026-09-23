@@ -3,3 +3,32 @@ enum Role {
   INSTRUCTOR
   ADMIN
 }
+
+enum SemesterType {
+  FIRST
+  SECOND
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+}
+
+enum ExamType {
+  MIDTERM
+  FINAL
+}
+
+enum Grade {
+  A_PLUS
+  A
+  A_MINUS
+  B_PLUS
+  B
+  B_MINUS
+  C_PLUS
+  C
+  D
+  F
+}

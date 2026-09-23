@@ -1,0 +1,24 @@
+model Section {
+  id           Int        @id @default(autoincrement())
+  name         String
+  capacity     Int
+
+  courseId     Int
+  course       Course     @relation(fields: [courseId], references: [id])
+
+  semesterId   Int
+  semester     Semester   @relation(fields: [semesterId], references: [id])
+
+  instructorId Int
+  instructor   Instructor @relation(fields: [instructorId], references: [id])
+
+  registrations Registration[]
+
+  exams Exam[]
+
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+
+  @@map("sections")
+}

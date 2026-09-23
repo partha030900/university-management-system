@@ -1,0 +1,13 @@
+model Semester {
+    id        Int          @id @default(autoincrement())
+    name      SemesterType
+    year      Int
+    startDate DateTime
+    endDate   DateTime
+    createdAt DateTime     @default(now())
+    updatedAt DateTime     @updatedAt
+
+    sections Section[]
+
+    @@unique([name, year])
+}

@@ -1,0 +1,19 @@
+model Registration {
+    id Int @id @default(autoincrement())
+
+    studentId Int
+    student   Student @relation(fields: [studentId], references: [id])
+
+    sectionId Int
+    section   Section @relation(fields: [sectionId], references: [id])
+
+    attendances Attendance[]
+    results Result[]
+
+    registeredAt DateTime @default(now())
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+
+    @@unique([studentId, sectionId])
+    @@map("registrations")
+}

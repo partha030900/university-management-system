@@ -1,0 +1,11 @@
+model Department {
+  id          Int          @id @default(autoincrement())
+  name        String
+  code        String       @unique
+  programs    Program[]
+  instructors Instructor[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("departments")
+}
