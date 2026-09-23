@@ -3,6 +3,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { resultRoutes } from "./modules/result/result.route.js";
 import { registrationRoutes } from "./modules/registration/registration.route.js";
+import { studentRoutes } from "./modules/student/student.route.js";
+import { examRoutes } from "./modules/exam/exam.route.js";
 
 
 const app: Application = express();
@@ -22,6 +24,10 @@ app.get("/api/v1/health", (req: Request, res: Response) => {
 app.use("/api/v1/results", resultRoutes);
 
 app.use("/api/v1/registrations", registrationRoutes);
+
+app.use("/api/v1/students", studentRoutes);
+
+app.use("/api/v1/exams", examRoutes);
 
 
 
