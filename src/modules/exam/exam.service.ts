@@ -17,6 +17,19 @@ const createExam = async (data: {
     throw new Error("Section not found");
   }
 
+  const existingExam = await prisma.exam.findUnique({
+  where: {
+    sectionId_type: {
+      sectionId,
+      type,
+    },
+  },
+});
+
+if (existingExam) {
+  throw new Error(`A ${type} exam already exists for this section`);
+}
+
   const exam = await prisma.exam.create({
     data: {
       title,
