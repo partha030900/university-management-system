@@ -6,6 +6,7 @@ import { registrationRoutes } from "./modules/registration/registration.route.js
 import { studentRoutes } from "./modules/student/student.route.js";
 import { examRoutes } from "./modules/exam/exam.route.js";
 import { globalErrorHandler } from "./middlewares/globalErrorHandler.js";
+import { attendanceRoutes } from "./modules/attendance/attendance.route.js";
 
 
 const app: Application = express();
@@ -29,6 +30,8 @@ app.use("/api/v1/registrations", registrationRoutes);
 app.use("/api/v1/students", studentRoutes);
 
 app.use("/api/v1/exams", examRoutes);
+
+app.use("/api/v1/attendance", attendanceRoutes);
 
 app.use(globalErrorHandler);
 
