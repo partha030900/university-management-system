@@ -19,14 +19,45 @@ const createRegistration = async (data: {
 
   // 2. Check if section exists
   const section = await prisma.section.findUnique({
-    where: {
-      id: sectionId,
+  where: { id: sectionId },
+  include: {
+    course: {
+      include: {
+        prerequisites: true,
+      },
     },
-  });
+  },
+});
 
   if (!section) {
     throw new Error("Section not found");
   }
+
+const prerequisites = section.course.prerequisites;
+
+for (const prerequisite of prerequisites) {
+  const completedPrerequisite = await prisma.registration.findFirst({
+    where: {
+      studentId,
+      section: {
+        courseId: prerequisite.id,
+      },
+      results: {
+        some: {
+          grade: {
+            not: "F",
+          },
+        },
+      },
+    },
+  });
+
+  if (!completedPrerequisite) {
+    throw new Error(
+      `Prerequisite course ${prerequisite.code} has not been completed`
+    );
+  }
+}
 
   // 3. Check if student is already registered
   const existingRegistration = await prisma.registration.findUnique({

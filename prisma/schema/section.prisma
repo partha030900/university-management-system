@@ -19,6 +19,8 @@ model Section {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
+  @@unique([name, courseId, semesterId])
+
 
   @@map("sections")
 }

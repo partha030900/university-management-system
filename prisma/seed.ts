@@ -107,6 +107,24 @@ async function main() {
   },
 });
 
+const advancedCourse = await prisma.course.upsert({
+  where: {
+    code: "CSE201",
+  },
+  update: {},
+  create: {
+    code: "CSE201",
+    title: "Advanced Computer Science",
+    description: "Advanced concepts in computer science",
+    credits: 3,
+    prerequisites: {
+      connect: {
+        id: course.id,
+      },
+    },
+  },
+});
+
   // Create semester
   const semester = await prisma.semester.upsert({
   where: {
@@ -125,27 +143,67 @@ async function main() {
 });
 
   // Create section
-  const section = await prisma.section.create({
-    data: {
+  const section = await prisma.section.upsert({
+  where: {
+    name_courseId_semesterId: {
       name: "A",
-      capacity: 30,
       courseId: course.id,
       semesterId: semester.id,
-      instructorId: instructor.id,
     },
-  });
+  },
+  update: {},
+  create: {
+    name: "A",
+    capacity: 30,
+    courseId: course.id,
+    semesterId: semester.id,
+    instructorId: instructor.id,
+  },
+});
+
+  const advancedSection = await prisma.section.upsert({
+  where: {
+    name_courseId_semesterId: {
+      name: "A",
+      courseId: advancedCourse.id,
+      semesterId: semester.id,
+    },
+  },
+  update: {},
+  create: {
+    name: "A",
+    capacity: 30,
+    courseId: advancedCourse.id,
+    semesterId: semester.id,
+    instructorId: instructor.id,
+  },
+});
+
+  const checkCourse = await prisma.course.findUnique({
+  where: {
+    code: "CSE201",
+  },
+  include: {
+    prerequisites: true,
+  },
+});
+
+  console.log("CSE201 prerequisites:", checkCourse?.prerequisites);
+
 
   console.log("Seed completed!");
 
-  console.log({
-    userId: user.id,
-    programId: program.id,
-    studentId: student.id,
-    instructorId: instructor.id,
-    courseId: course.id,
-    semesterId: semester.id,
-    sectionId: section.id,
-  });
+ console.log({
+  userId: user.id,
+  programId: program.id,
+  studentId: student.id,
+  instructorId: instructor.id,
+  courseId: course.id,
+  advancedCourseId: advancedCourse.id,
+  semesterId: semester.id,
+  sectionId: section.id,
+  advancedSectionId: advancedSection.id,
+});
 }
 
 main()
@@ -156,3 +214,5 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+  
+  
