@@ -1,4 +1,5 @@
 import { prisma } from "../../lib/prisma.js";
+import { AppError } from "../../utils/AppError.js";
 
 const createRegistration = async (data: {
   studentId: number;
@@ -7,7 +8,7 @@ const createRegistration = async (data: {
   const { studentId, sectionId } = data;
 
   const registration = await prisma.$transaction(async (tx) => {
-  
+
     const student = await tx.student.findUnique({
       where: {
         id: studentId,
@@ -15,10 +16,10 @@ const createRegistration = async (data: {
     });
 
     if (!student) {
-      throw new Error("Student not found");
+      throw new AppError(404, "Student not found");
     }
 
-    
+
     const section = await tx.section.findUnique({
       where: {
         id: sectionId,
@@ -33,10 +34,10 @@ const createRegistration = async (data: {
     });
 
     if (!section) {
-      throw new Error("Section not found");
+      throw new AppError(404, "Section not found");
     }
 
-    
+
     const prerequisites = section.course.prerequisites;
 
     for (const prerequisite of prerequisites) {
@@ -57,13 +58,11 @@ const createRegistration = async (data: {
       });
 
       if (!completedPrerequisite) {
-        throw new Error(
-          `Prerequisite course ${prerequisite.code} has not been completed`
-        );
+        throw new AppError( 400,`Prerequisite course ${prerequisite.code} has not been completed`);
       }
     }
 
-    
+
     const existingRegistration = await tx.registration.findUnique({
       where: {
         studentId_sectionId: {
@@ -74,10 +73,10 @@ const createRegistration = async (data: {
     });
 
     if (existingRegistration) {
-      throw new Error("Student is already registered in this section");
+      throw new AppError(409,"Student is already registered in this section")
     }
 
-    
+
     const registrationCount = await tx.registration.count({
       where: {
         sectionId,
@@ -85,10 +84,10 @@ const createRegistration = async (data: {
     });
 
     if (registrationCount >= section.capacity) {
-      throw new Error("Section is full");
+      throw new AppError(409, "Section is full");
     }
 
-    
+
     return tx.registration.create({
       data: {
         studentId,
