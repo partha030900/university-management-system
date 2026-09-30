@@ -8,6 +8,7 @@ import { examRoutes } from "./modules/exam/exam.route.js";
 import { globalErrorHandler } from "./middlewares/globalErrorHandler.js";
 import { attendanceRoutes } from "./modules/attendance/attendance.route.js";
 import { transcriptRoutes } from "./modules/transcript/transcript.route.js";
+import { authRoutes } from "./modules/auth/auth.route.js";
 
 
 const app: Application = express();
@@ -35,6 +36,8 @@ app.use("/api/v1/exams", examRoutes);
 app.use("/api/v1/attendance", attendanceRoutes);
 
 app.use("/api/v1/transcript", transcriptRoutes);
+
+app.use("/api/v1/auth", authRoutes);
 
 app.use(globalErrorHandler);
 
