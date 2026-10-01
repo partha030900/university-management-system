@@ -2,12 +2,13 @@ import express from "express";
 import { resultController } from "./result.controller.js";
 import { validateRequest } from "../../middlewares/validateRequest.js";
 import { createResultSchema } from "./result.validation.js";
+import { authenticate } from "../../middlewares/auth.js";
 
 
 const router = express.Router();
 
 router.get(
-  "/student/:studentId",
+  "/student/:studentId",authenticate,
   resultController.getStudentResults
 );
 
