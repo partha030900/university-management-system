@@ -8,7 +8,7 @@ model Registration {
     section   Section @relation(fields: [sectionId], references: [id])
 
     attendances Attendance[]
-    results Result[]
+    results     Result[]
 
     payments Payment[]
 
@@ -17,5 +17,7 @@ model Registration {
     updatedAt    DateTime @updatedAt
 
     @@unique([studentId, sectionId])
+    @@index([studentId])
+    @@index([sectionId])
     @@map("registrations")
 }

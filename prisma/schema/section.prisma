@@ -1,13 +1,13 @@
 model Section {
-  id           Int        @id @default(autoincrement())
-  name         String
-  capacity     Int
+  id       Int    @id @default(autoincrement())
+  name     String
+  capacity Int
 
-  courseId     Int
-  course       Course     @relation(fields: [courseId], references: [id])
+  courseId Int
+  course   Course @relation(fields: [courseId], references: [id])
 
-  semesterId   Int
-  semester     Semester   @relation(fields: [semesterId], references: [id])
+  semesterId Int
+  semester   Semester @relation(fields: [semesterId], references: [id])
 
   instructorId Int
   instructor   Instructor @relation(fields: [instructorId], references: [id])
@@ -16,11 +16,12 @@ model Section {
 
   exams Exam[]
 
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([name, courseId, semesterId])
-
-
+  @@index([courseId])
+  @@index([semesterId])
+  @@index([instructorId])
   @@map("sections")
 }

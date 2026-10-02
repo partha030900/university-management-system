@@ -16,6 +16,7 @@ model Exam {
   updatedAt  DateTime @updatedAt
 
   @@unique([sectionId, type])
-  
+  @@index([sectionId])
+
   @@map("exams")
 }

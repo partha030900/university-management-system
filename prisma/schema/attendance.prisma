@@ -10,6 +10,7 @@ model Attendance {
   updatedAt      DateTime         @updatedAt
 
   @@unique([registrationId, date])
-
+  @@index([registrationId])
+  
   @@map("attendances")
 }
