@@ -3,6 +3,11 @@ import { prisma } from "../../lib/prisma.js";
 import { AppError } from "../../utils/AppError.js";
 import config from "../../config/index.js";
 import { jwtUtils } from "../../utils/jwt.js";
+import jwt from "jsonwebtoken";
+import { OAuth2Client } from "google-auth-library";
+
+const googleClient = new OAuth2Client(config.google_client_id);
+
 
 
 const register = async (data: {
@@ -74,11 +79,98 @@ const login = async (data: {
 
  const accessToken = jwtUtils.createAccessToken(jwtPayload,config.jwt_access_secret,config.jwt_access_expires_in);
 
-  return {accessToken,
+ const refreshToken = jwtUtils.createRefreshToken(jwtPayload,config.jwt_refresh_secret,config.jwt_refresh_expires_in);
+
+  return {accessToken,refreshToken};
+  
+};
+
+const refreshAccessToken = async (refreshToken: string) => {
+  let decoded;
+
+  try {
+    decoded = jwt.verify(
+      refreshToken,
+      config.jwt_refresh_secret
+    ) as {
+      id: number;
+      email: string;
+      role: "STUDENT" | "INSTRUCTOR" | "ADMIN";
+    };
+  } catch {
+    throw new AppError(401, "Invalid or expired refresh token");
+  }
+
+  const accessToken = jwtUtils.createAccessToken(
+    {
+      id: decoded.id,
+      email: decoded.email,
+      role: decoded.role,
+    },
+    config.jwt_access_secret,
+    config.jwt_access_expires_in
+  );
+
+  return { accessToken };
+};
+
+const googleLogin = async (idToken: string) => {
+  const ticket = await googleClient.verifyIdToken({
+    idToken,
+    audience: config.google_client_id,
+  });
+
+  const payload = ticket.getPayload();
+
+  if ( !payload ||!payload.email ||payload.email_verified !== true) {
+  throw new AppError(401, "Invalidv Google account");
+}
+  const { email } = payload;
+
+  let user = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  if (!user) {
+    user = await prisma.user.create({
+      data: {
+        email,
+        password: "",
+        role: "STUDENT",
+      },
+    });
+  }
+
+  const jwtPayload = {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+  };
+
+  const accessToken = jwtUtils.createAccessToken(
+    jwtPayload,
+    config.jwt_access_secret,
+    config.jwt_access_expires_in
+  );
+
+  const refreshToken = jwtUtils.createRefreshToken(
+    jwtPayload,
+    config.jwt_refresh_secret,
+    config.jwt_refresh_expires_in
+  );
+
+  return {
+    accessToken,
+    refreshToken,
   };
 };
+
 
 export const authService = {
   register,
   login,
-};
+  refreshAccessToken,
+  googleLogin
+}

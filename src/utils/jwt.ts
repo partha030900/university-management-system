@@ -10,6 +10,22 @@ const createAccessToken = (
   );
 };
 
+const createRefreshToken = (
+  payload: object,
+  secret: string,
+  expiresIn: SignOptions["expiresIn"]
+) => {
+  return jwt.sign(
+    payload,
+    secret,
+    {
+      expiresIn,
+    } as SignOptions
+  );
+};
+
 export const jwtUtils = {
   createAccessToken,
+  createRefreshToken,
 };
+
