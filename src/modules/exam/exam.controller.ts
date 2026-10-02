@@ -2,7 +2,15 @@ import type { Request, Response } from "express";
 import { examService } from "./exam.service.js";
 
 const createExam = async (req: Request, res: Response) => {
-  const exam = await examService.createExam(req.body);
+  if (!req.user) {
+  throw new Error("Authentication required");
+}
+
+const exam = await examService.createExam(
+  req.body,
+  req.user.id as number,
+  req.user.role as string
+);
 
   res.status(201).json({
     success: true,
