@@ -32,3 +32,9 @@ enum Grade {
   D
   F
 }
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+}

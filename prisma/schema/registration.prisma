@@ -10,6 +10,8 @@ model Registration {
     attendances Attendance[]
     results Result[]
 
+    payments Payment[]
+
     registeredAt DateTime @default(now())
     createdAt    DateTime @default(now())
     updatedAt    DateTime @updatedAt

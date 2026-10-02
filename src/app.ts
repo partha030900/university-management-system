@@ -9,12 +9,22 @@ import { globalErrorHandler } from "./middlewares/globalErrorHandler.js";
 import { attendanceRoutes } from "./modules/attendance/attendance.route.js";
 import { transcriptRoutes } from "./modules/transcript/transcript.route.js";
 import { authRoutes } from "./modules/auth/auth.route.js";
+import { paymentRoutes } from "./modules/payment/payment.route.js";
+import { paymentController } from "./modules/payment/payment.controller.js";
+
 
 
 const app: Application = express();
 
 app.use(cors({ origin: true, credentials: true }));
 app.use(cookieParser());
+
+app.post(
+  "/api/v1/payments/webhook",
+  express.raw({ type: "application/json" }),
+  paymentController.stripeWebhook
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -38,6 +48,8 @@ app.use("/api/v1/attendance", attendanceRoutes);
 app.use("/api/v1/transcript", transcriptRoutes);
 
 app.use("/api/v1/auth", authRoutes);
+
+app.use("/api/v1/payments", paymentRoutes);
 
 app.use(globalErrorHandler);
 

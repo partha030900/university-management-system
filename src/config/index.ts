@@ -26,6 +26,9 @@ const config = {
     process.env.JWT_REFRESH_EXPIRES_IN as SignOptions["expiresIn"],
 
   google_client_id: process.env.GOOGLE_CLIENT_ID!,
+
+  stripe_secret_key: process.env.STRIPE_SECRET_KEY as string,
+  stripe_webhook_secret: process.env.STRIPE_WEBHOOK_SECRET as string,
 };
 
 export default config;
