@@ -58,6 +58,24 @@ const createStudent = async (data: {
   return student;
 };
 
+
+const getStudentById = async (id: number) => {
+  const student = await prisma.student.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      program: true,
+    },
+  });
+
+  if (!student) {
+    throw new Error("Student not found");
+  }
+
+  return student;
+};
+
 export const studentService = {
-  createStudent,
+  createStudent,getStudentById
 };

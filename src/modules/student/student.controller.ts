@@ -11,6 +11,18 @@ const createStudent = async (req: Request, res: Response) => {
   });
 };
 
+const getStudentById = async (req: Request, res: Response) => {
+  const student = await studentService.getStudentById(
+    Number(req.params.id)
+  );
+
+  res.status(200).json({
+    success: true,
+    message: "Student retrieved successfully",
+    data: student,
+  });
+};
+
 export const studentController = {
-  createStudent,
+  createStudent,getStudentById
 };

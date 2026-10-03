@@ -72,11 +72,11 @@ const createCheckoutSession = async (
       },
     ],
 
-    success_url:
-      "http://localhost:5000/api/v1/payments/success?session_id={CHECKOUT_SESSION_ID}",
+   success_url:
+  "https://university-management-system-liart.vercel.app/api/v1/payments/success?session_id={CHECKOUT_SESSION_ID}",
 
-    cancel_url:
-      "http://localhost:5000/api/v1/payments/cancel",
+cancel_url:
+  "https://university-management-system-liart.vercel.app/api/v1/payments/cancel",
 
     metadata: {
       paymentId: payment.id.toString(),
