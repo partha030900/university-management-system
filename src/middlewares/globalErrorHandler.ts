@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
+import { Prisma } from "../../generated/prisma/client";
 
 
 export const globalErrorHandler = (
@@ -8,6 +9,16 @@ export const globalErrorHandler = (
   next: NextFunction
 ) => {
   console.error(error);
+
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+  if (error.code === "P2002") {
+    return res.status(409).json({
+      success: false,
+      message: "Duplicate record already exists",
+      errors: [],
+    });
+  }
+}
 
   const statusCode = error.statusCode || 500;
 
