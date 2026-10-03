@@ -28,6 +28,13 @@ app.post(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.get("/", (req: Request, res: Response) => {
+  res.json({
+    success: true,
+    message: "University Management System API",
+  });
+});
+
 app.get("/api/v1/health", (req: Request, res: Response) => {
   res.json({
     success: true,
