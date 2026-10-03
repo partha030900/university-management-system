@@ -24,12 +24,12 @@ const createCheckoutSession = async (
     throw new AppError(404, "Registration not found");
   }
 
-  if (registration.studentId !== studentId) {
-    throw new AppError(
-      403,
-      "You can only pay for your own registration"
-    );
-  }
+  if (registration.student.userId !== studentId) {
+  throw new AppError(
+    403,
+    "You can only pay for your own registration"
+  );
+}
 
   const existingPayment = await prisma.payment.findFirst({
     where: {
