@@ -8,10 +8,6 @@ import { authorizeStudent } from "../../middlewares/authorizeStudent.js";
 const router = express.Router();
 
 router.get(
-  "/student/:studentId",
-  authenticate,
-  authorizeStudent,
-  transcriptController.getStudentTranscript
-);
+  "/student/:studentId",authenticate,authorizeStudent,transcriptController.getStudentTranscript);
 
 export const transcriptRoutes = router;
