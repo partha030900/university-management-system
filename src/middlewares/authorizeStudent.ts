@@ -24,7 +24,7 @@ export const authorizeStudent = async (
     );
   }
 
-  const requestedStudentId = Number(req.params.id);
+  const requestedStudentId = Number( req.params.id ?? req.params.studentId);
 
   const student = await prisma.student.findUnique({
     where: {
