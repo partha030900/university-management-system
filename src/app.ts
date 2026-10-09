@@ -11,6 +11,7 @@ import { transcriptRoutes } from "./modules/transcript/transcript.route.js";
 import { authRoutes } from "./modules/auth/auth.route.js";
 import { paymentRoutes } from "./modules/payment/payment.route.js";
 import { paymentController } from "./modules/payment/payment.controller.js";
+import { courseRoutes } from "./modules/courses/course.routes.js";
 
 
 
@@ -57,6 +58,8 @@ app.use("/api/v1/transcript", transcriptRoutes);
 app.use("/api/v1/auth", authRoutes);
 
 app.use("/api/v1/payments", paymentRoutes);
+
+app.use("/api/v1/courses", courseRoutes);
 
 app.use(globalErrorHandler);
 
