@@ -11,13 +11,21 @@ import { transcriptRoutes } from "./modules/transcript/transcript.route.js";
 import { authRoutes } from "./modules/auth/auth.route.js";
 import { paymentRoutes } from "./modules/payment/payment.route.js";
 import { paymentController } from "./modules/payment/payment.controller.js";
-import { courseRoutes } from "./modules/courses/course.routes.js";
+import { courseRoutes } from "./modules/courses/course.route.js";
 
 
 
 const app: Application = express();
 
-app.use(cors({ origin: true, credentials: true }));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://university-management-frontend.vercel.app",
+    ],
+    credentials: true,
+  })
+);
 app.use(cookieParser());
 
 app.post(
