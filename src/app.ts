@@ -12,13 +12,13 @@ import { authRoutes } from "./modules/auth/auth.route.js";
 import { paymentRoutes } from "./modules/payment/payment.route.js";
 import { paymentController } from "./modules/payment/payment.controller.js";
 import { courseRoutes } from "./modules/courses/course.route.js";
+import { sectionRoutes } from "./modules/section/section.route.js";
 
 
 
 const app: Application = express();
 
-app.use(
-  cors({
+app.use(cors({
     origin: [
       "http://localhost:3000",
       "https://university-management-frontend.vercel.app",
@@ -68,6 +68,8 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/payments", paymentRoutes);
 
 app.use("/api/v1/courses", courseRoutes);
+
+app.use("/api/v1/sections", sectionRoutes);
 
 app.use(globalErrorHandler);
 
