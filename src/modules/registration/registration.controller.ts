@@ -14,6 +14,23 @@ const createRegistration = async (req: Request, res: Response) => {
   });
 };
 
+const getMyRegistrations = async (req: Request, res: Response) => {
+  if (!req.user) {
+    throw new Error("Authentication required");
+  }
+
+  const registrations =
+    await registrationService.getStudentRegistrations(
+      req.user.id as number
+    );
+
+  res.status(200).json({
+    success: true,
+    message: "Registrations fetched successfully",
+    data: registrations,
+  });
+};
+
 export const registrationController = {
-  createRegistration,
+  createRegistration,getMyRegistrations
 };

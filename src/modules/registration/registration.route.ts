@@ -19,4 +19,12 @@ router.post(
   registrationController.createRegistration
 );
 
+
+router.get(
+  "/mine",
+  authenticate,
+  authorize("STUDENT"),
+  registrationController.getMyRegistrations
+);
+
 export const registrationRoutes = router;

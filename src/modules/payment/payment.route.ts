@@ -9,13 +9,7 @@ import { validateRequest } from "../../middlewares/validateRequest.js";
 
 const router = express.Router();
 
-router.post(
-  "/checkout",
-  authenticate,
-  authorize("STUDENT"),
-  validateRequest(createCheckoutSessionSchema),
-  paymentController.createCheckoutSession
-);
+router.post("/checkout",authenticate,authorize("STUDENT"),validateRequest(createCheckoutSessionSchema),paymentController.createCheckoutSession);
 
 router.get(
   "/success",

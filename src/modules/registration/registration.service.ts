@@ -99,6 +99,44 @@ const createRegistration = async (data: {
   return registration;
 };
 
+const getStudentRegistrations = async (userId: number) => {
+  const student = await prisma.student.findFirst({
+    where: { userId },
+  });
+
+  if (!student) {
+    throw new AppError(404, "Student not found");
+  }
+
+  const registrations = await prisma.registration.findMany({
+    where: {
+      studentId: student.id,
+    },
+    include: {
+      section: {
+        include: {
+          course: true,
+        },
+      },
+    },
+  });
+
+  const payments = await prisma.payment.findMany({
+    where: {
+      registrationId: {
+        in: registrations.map((registration) => registration.id),
+      },
+    },
+  });
+
+  return registrations.map((registration) => ({
+    ...registration,
+    payments: payments.filter(
+      (payment) => payment.registrationId === registration.id
+    ),
+  }));
+};
+
 export const registrationService = {
-  createRegistration,
+  createRegistration,getStudentRegistrations
 };
