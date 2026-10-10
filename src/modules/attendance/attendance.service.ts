@@ -140,7 +140,6 @@ const getSectionStudents = async (
     include: {
       student: {
         include: {
-          user: true,
           program: true,
         },
       },
@@ -158,6 +157,8 @@ const getSectionStudents = async (
     students: registrations,
   };
 };
+
+
 
 export const attendanceService = {
   createAttendance,getAttendanceSummary,getSectionStudents

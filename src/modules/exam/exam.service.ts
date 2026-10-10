@@ -62,6 +62,55 @@ if (existingExam) {
   return exam;
 };
 
+const getMyExams = async (
+  userId: number,
+  userRole: string
+) => {
+  if (userRole === "INSTRUCTOR") {
+    const instructor = await prisma.instructor.findUnique({
+      where: { userId },
+    });
+
+    if (!instructor) {
+      throw new AppError(404, "Instructor not found");
+    }
+
+    return prisma.exam.findMany({
+      where: {
+        section: {
+          instructorId: instructor.id,
+        },
+      },
+      include: {
+        section: {
+          include: {
+            course: true,
+            semester: true,
+          },
+        },
+      },
+      orderBy: {
+        examDate: "asc",
+      },
+    });
+  }
+
+  return prisma.exam.findMany({
+    include: {
+      section: {
+        include: {
+          course: true,
+          semester: true,
+        },
+      },
+    },
+    orderBy: {
+      examDate: "asc",
+    },
+  });
+};
+
 export const examService = {
   createExam,
+  getMyExams,
 };

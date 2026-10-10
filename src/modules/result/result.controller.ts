@@ -29,9 +29,20 @@ const getStudentGPA = async (req: Request, res: Response) => {
   });
 };
 
+
 const createResult = async (req: Request, res: Response) => {
-  console.log("BODY:", req.body);
-  const result = await resultService.createResult(req.body);
+  const userId = Number(req.user?.id);
+  const userRole = String(req.user?.role);
+
+  if (!userId || !Number.isInteger(userId)) {
+    throw new Error("Invalid user ID in authentication token");
+  }
+
+  const result = await resultService.createResult(
+    req.body,
+    userId,
+    userRole
+  );
 
   res.status(201).json({
     success: true,
@@ -39,6 +50,7 @@ const createResult = async (req: Request, res: Response) => {
     data: result,
   });
 };
+
 
 export const resultController = {
   getStudentResults,

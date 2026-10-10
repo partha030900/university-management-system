@@ -83,17 +83,22 @@ const getStudentGPA = async (studentId: number) => {
   return calculateGPA(finalCourseResults);
 };
 
-const createResult = async (data: {
-  registrationId: number;
-  examId: number;
-  marks: number;
-}) => {
+
+const createResult = async (
+  data: {
+    registrationId: number;
+    examId: number;
+    marks: number;
+  },
+  userId: number,
+  userRole: string
+) => {
   const { registrationId, examId, marks } = data;
 
-  // Check if registration exists
   const registration = await prisma.registration.findUnique({
-    where: {
-      id: registrationId,
+    where: { id: registrationId },
+    include: {
+      section: true,
     },
   });
 
@@ -101,10 +106,10 @@ const createResult = async (data: {
     throw new Error("Registration not found");
   }
 
-  // Check if exam exists
   const exam = await prisma.exam.findUnique({
-    where: {
-      id: examId,
+    where: { id: examId },
+    include: {
+      section: true,
     },
   });
 
@@ -112,10 +117,40 @@ const createResult = async (data: {
     throw new Error("Exam not found");
   }
 
-  // Calculate grade from marks
+  // The student must be registered in the exam's section.
+  if (registration.sectionId !== exam.sectionId) {
+    throw new Error(
+      "This student is not registered in the exam's section"
+    );
+  }
+
+  // Instructors can enter results only for their own sections.
+if (userRole === "INSTRUCTOR") {
+  const instructor = await prisma.instructor.findUnique({
+    where: { userId },
+  });
+
+  if (!instructor) {
+    throw new Error("Instructor profile not found");
+  }
+
+  if (exam.section.instructorId !== instructor.id) {
+    throw new Error(
+      "You do not have permission to enter results for this section"
+    );
+  }
+}
+
+
+  // Marks cannot exceed the exam's maximum marks.
+  if (marks > exam.totalMarks) {
+    throw new Error(
+      `Marks cannot exceed ${exam.totalMarks}`
+    );
+  }
+
   const grade = getGradeFromMarks(marks);
 
-  // Create result
   const result = await prisma.result.create({
     data: {
       registrationId,
@@ -127,6 +162,7 @@ const createResult = async (data: {
 
   return result;
 };
+
 
 export const resultService = {
   getStudentResults,
