@@ -76,6 +76,17 @@ const getStudentById = async (id: number) => {
   return student;
 };
 
+const getAllStudents = async () => {
+  return prisma.student.findMany({
+    orderBy: {
+      id: "asc",
+    },
+    include: {
+      program: true,
+    },
+  });
+};
+
 export const studentService = {
-  createStudent,getStudentById
+  createStudent,getStudentById,getAllStudents
 };

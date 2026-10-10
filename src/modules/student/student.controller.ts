@@ -23,6 +23,16 @@ const getStudentById = async (req: Request, res: Response) => {
   });
 };
 
+const getAllStudents = async (_req: Request, res: Response) => {
+  const students = await studentService.getAllStudents();
+
+  res.status(200).json({
+    success: true,
+    message: "Students retrieved successfully",
+    data: students,
+  });
+};
+
 export const studentController = {
-  createStudent,getStudentById
+  createStudent,getStudentById,getAllStudents
 };

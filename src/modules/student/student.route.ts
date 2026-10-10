@@ -12,4 +12,6 @@ router.post("/",authenticate,authorize("ADMIN"),validateRequest(createStudentSch
 
 router.get("/:id",authenticate,authorizeStudent,studentController.getStudentById);
 
+router.get("/",authenticate,authorize("ADMIN"),studentController.getAllStudents);
+
 export const studentRoutes = router;
