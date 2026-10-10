@@ -165,7 +165,23 @@ const getAdminRegistrationStats = async () => {
     pendingPayments,
   };
 };
+const getAllRegistrations = async () => {
+  return prisma.registration.findMany({
+    orderBy: {
+      registeredAt: "desc",
+    },
+    include: {
+      student: true,
+      section: {
+        include: {
+          course: true,
+        },
+      },
+      payments: true,
+    },
+  });
+};
 
 export const registrationService = {
-  createRegistration,getStudentRegistrations,getAdminRegistrationStats
+  createRegistration,getStudentRegistrations,getAdminRegistrationStats,getAllRegistrations
 };
