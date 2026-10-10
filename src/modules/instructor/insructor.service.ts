@@ -29,7 +29,43 @@ const getMySections = async (userId: number) => {
   });
 };
 
+const getMyStudents = async (userId: number) => {
+  const instructor = await prisma.instructor.findUnique({
+    where: { userId },
+  });
+
+  if (!instructor) {
+    throw new AppError(404, "Instructor not found");
+  }
+
+  const registrations = await prisma.registration.findMany({
+    where: {
+      section: {
+        instructorId: instructor.id,
+      },
+    },
+    include: {
+      student: {
+        include: {
+          program: true,
+        },
+      },
+      section: {
+        include: {
+          course: true,
+        },
+      },
+    },
+    orderBy: {
+      registeredAt: "desc",
+    },
+  });
+
+  return registrations;
+};
+
 export const instructorService = {
   getAllInstructorsCount,
   getMySections,
+  getMyStudents,
 };

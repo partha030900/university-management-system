@@ -20,4 +20,11 @@ router.get(
   instructorController.getMySections
 );
 
+router.get(
+  "/my-students",
+  authenticate,
+  authorize("INSTRUCTOR"),
+  instructorController.getMyStudents
+);
+
 export const instructorRoutes = router;

@@ -23,7 +23,20 @@ const getMySections = async (req: Request, res: Response) => {
   });
 };
 
+const getMyStudents = async (req: Request, res: Response) => {
+  const userId = req.user!.id;
+
+  const students = await instructorService.getMyStudents(userId);
+
+  res.status(200).json({
+    success: true,
+    message: "Instructor students retrieved successfully",
+    data: students,
+  });
+};
+
 export const instructorController = {
   getAllInstructorsCount,
   getMySections,
+  getMyStudents
 };
