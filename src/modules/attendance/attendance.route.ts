@@ -24,4 +24,11 @@ router.get(
   attendanceController.getAttendanceSummary
 );
 
+router.get(
+  "/section/:sectionId/students",
+  authenticate,
+  authorize("ADMIN", "INSTRUCTOR"),
+  attendanceController.getSectionStudents
+);
+
 export const attendanceRoutes = router;
