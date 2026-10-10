@@ -13,6 +13,7 @@ import { paymentRoutes } from "./modules/payment/payment.route.js";
 import { paymentController } from "./modules/payment/payment.controller.js";
 import { courseRoutes } from "./modules/courses/course.route.js";
 import { sectionRoutes } from "./modules/section/section.route.js";
+import { instructorRoutes } from "./modules/instructor/instructor.route.js";
 
 
 
@@ -70,6 +71,8 @@ app.use("/api/v1/payments", paymentRoutes);
 app.use("/api/v1/courses", courseRoutes);
 
 app.use("/api/v1/sections", sectionRoutes);
+
+app.use("/api/v1/instructors", instructorRoutes);
 
 app.use(globalErrorHandler);
 
