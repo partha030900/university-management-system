@@ -1,15 +1,23 @@
-import express from "express";
-import { instructorController } from "./instructor.controller.js";
-import { authenticate } from "../../middlewares/auth.js";
-import { authorize } from "../../middlewares/authorize.js";
+import { Router } from "express";
+import { instructorController } from "./instructor.controller";
+import { authenticate } from "../../middlewares/auth";
+import { authorize } from "../../middlewares/authorize";
 
-const router = express.Router();
+
+const router = Router();
 
 router.get(
   "/count",
   authenticate,
   authorize("ADMIN"),
   instructorController.getAllInstructorsCount
+);
+
+router.get(
+  "/my-sections",
+  authenticate,
+  authorize("INSTRUCTOR"),
+  instructorController.getMySections
 );
 
 export const instructorRoutes = router;
