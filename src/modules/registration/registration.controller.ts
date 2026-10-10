@@ -31,6 +31,19 @@ const getMyRegistrations = async (req: Request, res: Response) => {
   });
 };
 
+const getAdminRegistrationStats = async (
+  _req: Request,
+  res: Response
+) => {
+  const stats = await registrationService.getAdminRegistrationStats();
+
+  res.status(200).json({
+    success: true,
+    message: "Registration statistics retrieved successfully",
+    data: stats,
+  });
+};
+
 export const registrationController = {
-  createRegistration,getMyRegistrations
+  createRegistration,getMyRegistrations,getAdminRegistrationStats
 };

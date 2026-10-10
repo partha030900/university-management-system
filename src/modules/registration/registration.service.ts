@@ -137,6 +137,35 @@ const getStudentRegistrations = async (userId: number) => {
   }));
 };
 
+const getAdminRegistrationStats = async () => {
+  const [totalRegistrations, paidRegistrations, pendingPayments] =
+    await Promise.all([
+      prisma.registration.count(),
+
+      prisma.registration.count({
+        where: {
+          payments: {
+            some: {
+              status: "PAID",
+            },
+          },
+        },
+      }),
+
+      prisma.payment.count({
+        where: {
+          status: "PENDING",
+        },
+      }),
+    ]);
+
+  return {
+    totalRegistrations,
+    paidRegistrations,
+    pendingPayments,
+  };
+};
+
 export const registrationService = {
-  createRegistration,getStudentRegistrations
+  createRegistration,getStudentRegistrations,getAdminRegistrationStats
 };

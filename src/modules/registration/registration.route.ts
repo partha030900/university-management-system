@@ -27,4 +27,11 @@ router.get(
   registrationController.getMyRegistrations
 );
 
+router.get(
+  "/admin-stats",
+  authenticate,
+  authorize("ADMIN"),
+  registrationController.getAdminRegistrationStats
+);
+
 export const registrationRoutes = router;
