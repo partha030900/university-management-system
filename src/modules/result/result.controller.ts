@@ -51,9 +51,47 @@ const createResult = async (req: Request, res: Response) => {
   });
 };
 
+const getExamStudents = async (req: Request, res: Response) => {
+  const examId = Number(req.params.examId);
+  const userId = Number(req.user?.id);
+  const userRole = String(req.user?.role);
+
+  const result = await resultService.getExamStudents(
+    examId,
+    userId,
+    userRole
+  );
+
+  res.status(200).json({
+    success: true,
+    message: "Exam students retrieved successfully",
+    data: result,
+  });
+};
+
+const getExamPerformance = async (req: Request, res: Response) => {
+  const examId = Number(req.params.examId);
+  const userId = Number(req.user?.id);
+  const userRole = String(req.user?.role);
+
+  const result = await resultService.getExamPerformance(
+    examId,
+    userId,
+    userRole
+  );
+
+  res.status(200).json({
+    success: true,
+    message: "Exam performance retrieved successfully",
+    data: result,
+  });
+};
+
 
 export const resultController = {
   getStudentResults,
   getStudentGPA,
-  createResult
+  getExamStudents,
+  createResult,
+  getExamPerformance,
 };

@@ -33,11 +33,40 @@ const paymentSuccess = async (
   req: Request,
   res: Response
 ) => {
+  const sessionId = req.query.session_id;
+
+  if (typeof sessionId !== "string") {
+    throw new AppError(400, "Invalid Stripe session ID");
+  }
+
+  const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+  if (session.payment_status !== "paid") {
+    throw new AppError(400, "Payment has not been completed");
+  }
+
+  const payment = await prisma.payment.findFirst({
+    where: {
+      stripeSessionId: session.id,
+      status: "PAID",
+    },
+  });
+
+  if (!payment) {
+    throw new AppError(
+      404,
+      "Payment confirmation is still being processed"
+    );
+  }
+
   res.status(200).json({
     success: true,
     message: "Payment completed successfully",
     data: {
-      sessionId: req.query.session_id,
+      paymentId: payment.id,
+      amount: payment.amount,
+      currency: payment.currency,
+      paidAt: payment.paidAt,
     },
   });
 };
@@ -77,17 +106,31 @@ const stripeWebhook = async (
 
     const paymentId = session.metadata?.paymentId;
 
-    if (paymentId) {
-      await prisma.payment.update({
-        where: {
-          id: Number(paymentId),
-        },
-        data: {
-          status: "PAID",
-          paidAt: new Date(),
-        },
-      });
-    }
+    if (paymentId && session.payment_status === "paid") {
+  const payment = await prisma.payment.findUnique({
+    where: {
+      id: Number(paymentId),
+    },
+  });
+
+  if (
+    payment &&
+    payment.stripeSessionId === session.id &&
+    session.amount_total === Math.round(payment.amount * 100) &&
+    session.currency === payment.currency.toLowerCase() &&
+    payment.status === "PENDING"
+  ) {
+    await prisma.payment.update({
+      where: {
+        id: payment.id,
+      },
+      data: {
+        status: "PAID",
+        paidAt: new Date(),
+      },
+    });
+  }
+}
   }
 
   res.status(200).json({

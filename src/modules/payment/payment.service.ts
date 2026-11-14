@@ -45,7 +45,65 @@ const createCheckoutSession = async (
     );
   }
 
-  const amount = 100;
+  const pendingPayment = await prisma.payment.findFirst({
+  where: {
+    registrationId,
+    status: "PENDING",
+  },
+  orderBy: {
+    createdAt: "desc",
+  },
+});
+
+if (pendingPayment) {
+  if (!pendingPayment.stripeSessionId) {
+    throw new AppError(
+      409,
+      "Your payment session is being prepared. Please try again shortly."
+    );
+  }
+
+  const existingSession = await stripe.checkout.sessions.retrieve(
+    pendingPayment.stripeSessionId
+  );
+
+  if (existingSession.status === "open") {
+    return {
+      paymentId: pendingPayment.id,
+      checkoutUrl: existingSession.url,
+    };
+  }
+
+  if (existingSession.status === "complete") {
+    throw new AppError(
+      409,
+      "Your payment is being processed. Please wait for confirmation."
+    );
+  }
+
+  if (existingSession.status === "expired") {
+    await prisma.payment.update({
+      where: {
+        id: pendingPayment.id,
+      },
+      data: {
+        status: "FAILED",
+      },
+    });
+  }
+}
+
+  const amount = Number(registration.section.course.fee);
+
+if (!Number.isFinite(amount) || amount <= 0) {
+  throw new AppError(400, "Invalid course fee");
+}
+
+ const amountInCents = Math.round(amount * 100);
+
+if (!Number.isSafeInteger(amountInCents)) {
+  throw new AppError(400, "Invalid payment amount");
+}
 
   const payment = await prisma.payment.create({
     data: {
@@ -56,7 +114,12 @@ const createCheckoutSession = async (
     },
   });
 
-  const session = await stripe.checkout.sessions.create({
+ 
+
+  let session;
+
+try {
+  session = await stripe.checkout.sessions.create({
     mode: "payment",
 
     line_items: [
@@ -66,23 +129,31 @@ const createCheckoutSession = async (
           product_data: {
             name: registration.section.course.title,
           },
-          unit_amount: amount * 100,
+          unit_amount: amountInCents,
         },
         quantity: 1,
       },
     ],
 
-   success_url:
-  "https://university-management-system-liart.vercel.app/api/v1/payments/success?session_id={CHECKOUT_SESSION_ID}",
+    success_url:
+      "https://university-management-system-liart.vercel.app/api/v1/payments/success?session_id={CHECKOUT_SESSION_ID}",
 
-cancel_url:
-  "https://university-management-system-liart.vercel.app/api/v1/payments/cancel",
+    cancel_url:
+      "https://university-management-system-liart.vercel.app/api/v1/payments/cancel",
 
     metadata: {
       paymentId: payment.id.toString(),
       registrationId: registrationId.toString(),
     },
   });
+} catch (error) {
+  await prisma.payment.update({
+    where: { id: payment.id },
+    data: { status: "FAILED" },
+  });
+
+  throw error;
+}
 
   await prisma.payment.update({
     where: {

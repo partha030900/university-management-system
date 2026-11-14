@@ -4,6 +4,7 @@ import { validateRequest } from "../../middlewares/validateRequest.js";
 import { authenticate } from "../../middlewares/auth.js";
 import { authorize } from "../../middlewares/authorize.js";
 import { createExamSchema } from "./exam.validation.js";
+import { updateExamSchema } from "./exam.validation.js";
 
 const router = express.Router();
 
@@ -20,6 +21,21 @@ router.get(
   authenticate,
   authorize("ADMIN", "INSTRUCTOR"),
   examController.getMyExams
+);
+
+router.put(
+  "/:examId",
+  authenticate,
+  authorize("ADMIN", "INSTRUCTOR"),
+  validateRequest(updateExamSchema),
+  examController.updateExam
+);
+
+router.delete(
+  "/:examId",
+  authenticate,
+  authorize("ADMIN", "INSTRUCTOR"),
+  examController.deleteExam
 );
 
 export const examRoutes = router;

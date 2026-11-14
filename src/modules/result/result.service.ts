@@ -83,6 +83,142 @@ const getStudentGPA = async (studentId: number) => {
   return calculateGPA(finalCourseResults);
 };
 
+const getExamStudents = async (
+  examId: number,
+  userId: number,
+  userRole: string
+) => {
+  const exam = await prisma.exam.findUnique({
+    where: { id: examId },
+    include: {
+      section: true,
+    },
+  });
+
+  if (!exam) {
+    throw new Error("Exam not found");
+  }
+
+  if (userRole === "INSTRUCTOR") {
+    const instructor = await prisma.instructor.findUnique({
+      where: { userId },
+    });
+
+    if (!instructor) {
+      throw new Error("Instructor profile not found");
+    }
+
+    if (exam.section.instructorId !== instructor.id) {
+      throw new Error(
+        "You do not have permission to view students for this exam"
+      );
+    }
+  }
+
+  const registrations = await prisma.registration.findMany({
+    where: {
+      sectionId: exam.sectionId,
+    },
+    include: {
+      student: {
+        include: {
+          user: {
+            select: {
+              email: true,
+            },
+          },
+        },
+      },
+      results: {
+        where: {
+          examId,
+        },
+      },
+    },
+  });
+
+  return {
+    exam,
+    students: registrations.map((registration) => ({
+      registrationId: registration.id,
+      studentId: registration.student.studentId,
+      name: registration.student.name,
+      email: registration.student.user.email,
+      result: registration.results[0] ?? null,
+    })),
+  };
+};
+
+
+const getExamPerformance = async (
+  examId: number,
+  userId: number,
+  userRole: string
+) => {
+  const exam = await prisma.exam.findUnique({
+    where: { id: examId },
+    include: {
+      section: true,
+    },
+  });
+
+  if (!exam) {
+    throw new Error("Exam not found");
+  }
+
+  // Check instructor ownership.
+  if (userRole === "INSTRUCTOR") {
+    const instructor = await prisma.instructor.findUnique({
+      where: { userId },
+    });
+
+    if (!instructor) {
+      throw new Error("Instructor profile not found");
+    }
+
+    if (exam.section.instructorId !== instructor.id) {
+      throw new Error(
+        "You do not have permission to view this exam's performance"
+      );
+    }
+  }
+
+  const results = await prisma.result.findMany({
+    where: {
+      examId,
+    },
+  });
+
+  const totalStudents = await prisma.registration.count({
+    where: {
+      sectionId: exam.sectionId,
+    },
+  });
+
+  const marks = results.map((result) => result.marks);
+
+  const passedStudents = marks.filter((mark) => mark >= 40).length;
+  const failedStudents = marks.filter((mark) => mark < 40).length;
+
+  const averageMarks =
+    marks.length > 0
+      ? marks.reduce((sum, mark) => sum + mark, 0) / marks.length
+      : 0;
+
+  return {
+    exam,
+    totalStudents,
+    studentsGraded: marks.length,
+    studentsNotGraded: totalStudents - marks.length,
+    averageMarks: Number(averageMarks.toFixed(2)),
+    passedStudents,
+    failedStudents,
+    highestMarks: marks.length > 0 ? Math.max(...marks) : null,
+    lowestMarks: marks.length > 0 ? Math.min(...marks) : null,
+  };
+};
+
+
 
 const createResult = async (
   data: {
@@ -151,14 +287,24 @@ if (userRole === "INSTRUCTOR") {
 
   const grade = getGradeFromMarks(marks);
 
-  const result = await prisma.result.create({
-    data: {
+  const result = await prisma.result.upsert({
+  where: {
+    registrationId_examId: {
       registrationId,
       examId,
-      marks,
-      grade,
     },
-  });
+  },
+  update: {
+    marks,
+    grade,
+  },
+  create: {
+    registrationId,
+    examId,
+    marks,
+    grade,
+  },
+});
 
   return result;
 };
@@ -167,5 +313,7 @@ if (userRole === "INSTRUCTOR") {
 export const resultService = {
   getStudentResults,
   getStudentGPA,
-  createResult
+  getExamStudents,
+  getExamPerformance,
+  createResult,
 };

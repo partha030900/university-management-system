@@ -1,4 +1,5 @@
 import { prisma } from "../../lib/prisma.js";
+import { AppError } from "../../utils/AppError.js";
 
 const createStudent = async (data: {
   userId: number;
@@ -58,6 +59,39 @@ const createStudent = async (data: {
   return student;
 };
 
+const createMyStudentProfile = async (
+  userId: number,
+  data: {
+    studentId: string;
+    name: string;
+    programId: number;
+    dateOfBirth?: Date;
+    phone?: string;
+  }
+) => {
+  return createStudent({
+    userId,
+    ...data,
+  });
+};
+
+const getMyStudentProfile = async (userId: number) => {
+  const student = await prisma.student.findUnique({
+    where: {
+      userId,
+    },
+    include: {
+      program: true,
+    },
+  });
+
+  if (!student) {
+  throw new AppError(404, "Student profile not found");
+}
+
+
+  return student;
+};
 
 const getStudentById = async (id: number) => {
   const student = await prisma.student.findUnique({
@@ -87,6 +121,14 @@ const getAllStudents = async () => {
   });
 };
 
+const getAllPrograms = async () => {
+  return prisma.program.findMany({
+    orderBy: {
+      id: "asc",
+    },
+  });
+};
+
 export const studentService = {
-  createStudent,getStudentById,getAllStudents
+  createStudent,createMyStudentProfile,getMyStudentProfile,getStudentById,getAllStudents,getAllPrograms
 };

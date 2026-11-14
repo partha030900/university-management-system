@@ -7,3 +7,10 @@ export const createExamSchema = z.object({
   sectionId: z.number().int().positive(),
   examDate: z.coerce.date(),
 });
+
+export const updateExamSchema = createExamSchema
+  .partial()
+  .refine(
+    (data) => Object.keys(data).length > 0,
+    { message: "At least one field must be provided" }
+  );

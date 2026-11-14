@@ -23,8 +23,21 @@ router.get(
   resultController.getStudentGPA
 );
 
-router.post("/",authenticate,authorize("ADMIN", "INSTRUCTOR"),validateRequest(createResultSchema),resultController.createResult);
+router.get(
+  "/exam/:examId/students",
+  authenticate,
+  authorize("ADMIN", "INSTRUCTOR"),
+  resultController.getExamStudents
+);
 
+router.post("/", authenticate, authorize("ADMIN", "INSTRUCTOR"), validateRequest(createResultSchema), resultController.createResult);
+
+router.get(
+  "/exam/:examId/performance",
+  authenticate,
+  authorize("ADMIN", "INSTRUCTOR"),
+  resultController.getExamPerformance
+);
 
 
 export const resultRoutes = router;

@@ -110,7 +110,116 @@ const getMyExams = async (
   });
 };
 
+const updateExam = async (
+  examId: number,
+  data: {
+    title?: string;
+    type?: "MIDTERM" | "FINAL";
+    totalMarks?: number;
+    sectionId?: number;
+    examDate?: Date;
+  },
+  userId: number,
+  userRole: string
+) => {
+  const existingExam = await prisma.exam.findUnique({
+    where: { id: examId },
+    include: { section: true },
+  });
+
+  if (!existingExam) {
+    throw new AppError(404, "Exam not found");
+  }
+
+  if (userRole === "INSTRUCTOR") {
+    const instructor = await prisma.instructor.findUnique({
+      where: { userId },
+    });
+
+    if (!instructor || existingExam.section.instructorId !== instructor.id) {
+      throw new AppError(403, "You cannot update this exam");
+    }
+  }
+
+  const newSectionId = data.sectionId ?? existingExam.sectionId;
+  const newType = data.type ?? existingExam.type;
+
+  const section = await prisma.section.findUnique({
+    where: { id: newSectionId },
+  });
+
+  if (!section) {
+    throw new AppError(404, "Section not found");
+  }
+
+  if (userRole === "INSTRUCTOR") {
+    const instructor = await prisma.instructor.findUnique({
+      where: { userId },
+    });
+
+    if (!instructor || section.instructorId !== instructor.id) {
+      throw new AppError(403, "You cannot assign an exam to this section");
+    }
+  }
+
+  const duplicateExam = await prisma.exam.findUnique({
+    where: {
+      sectionId_type: {
+        sectionId: newSectionId,
+        type: newType,
+      },
+    },
+  });
+
+  if (duplicateExam && duplicateExam.id !== examId) {
+    throw new AppError(400, "An exam of this type already exists for this section");
+  }
+
+  return prisma.exam.update({
+    where: { id: examId },
+    data,
+  });
+};
+
+const deleteExam = async (
+  examId: number,
+  userId: number,
+  userRole: string
+) => {
+  const exam = await prisma.exam.findUnique({
+    where: { id: examId },
+    include: { section: true },
+  });
+
+  if (!exam) {
+    throw new AppError(404, "Exam not found");
+  }
+
+  if (userRole === "INSTRUCTOR") {
+    const instructor = await prisma.instructor.findUnique({
+      where: { userId },
+    });
+
+    if (!instructor || exam.section.instructorId !== instructor.id) {
+      throw new AppError(403, "You cannot delete this exam");
+    }
+  }
+
+  await prisma.$transaction([
+    prisma.result.deleteMany({
+      where: { examId },
+    }),
+    prisma.exam.delete({
+      where: { id: examId },
+    }),
+  ]);
+
+  return exam;
+};
+
 export const examService = {
   createExam,
   getMyExams,
+  updateExam,
+  deleteExam,
 };

@@ -8,3 +8,11 @@ export const createStudentSchema = z.object({
   dateOfBirth: z.coerce.date().optional(),
   phone: z.string().optional(),
 });
+
+export const createMyStudentProfileSchema = z.object({
+  studentId: z.string().min(1),
+  name: z.string().min(1),
+  programId: z.number().int().positive(),
+  dateOfBirth: z.coerce.date().optional(),
+  phone: z.string().optional(),
+});

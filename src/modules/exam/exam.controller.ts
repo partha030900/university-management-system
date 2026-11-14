@@ -37,9 +37,51 @@ const getMyExams = async (req: Request, res: Response) => {
   });
 };
 
+const updateExam = async (req: Request, res: Response) => {
+  if (!req.user) {
+    throw new Error("Authentication required");
+  }
+
+  const examId = Number(req.params.examId);
+
+  const exam = await examService.updateExam(
+    examId,
+    req.body,
+    req.user.id as number,
+    req.user.role as string
+  );
+
+  res.status(200).json({
+    success: true,
+    message: "Exam updated successfully",
+    data: exam,
+  });
+};
+
+const deleteExam = async (req: Request, res: Response) => {
+  if (!req.user) {
+    throw new Error("Authentication required");
+  }
+
+  const examId = Number(req.params.examId);
+
+  await examService.deleteExam(
+    examId,
+    req.user.id as number,
+    req.user.role as string
+  );
+
+  res.status(200).json({
+    success: true,
+    message: "Exam deleted successfully",
+  });
+};
+
 export const examController = {
   createExam,
   getMyExams,
+  updateExam,
+  deleteExam,
 };
 
 

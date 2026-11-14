@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Course" ADD COLUMN     "fee" DECIMAL(10,2) NOT NULL DEFAULT 0;
+
+-- AddForeignKey
+ALTER TABLE "Student" ADD CONSTRAINT "Student_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

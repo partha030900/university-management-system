@@ -5,6 +5,8 @@ model Course {
   description String?
   credits     Float
 
+  fee Decimal @default(0) @db.Decimal(10, 2)
+
   prerequisites Course[] @relation("CoursePrerequisites")
   requiredFor   Course[] @relation("CoursePrerequisites")
 
