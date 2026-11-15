@@ -22,6 +22,26 @@ const getAllCourses = async () => {
   });
 };
 
+
+const createCourse = async (data: {
+  code: string;
+  title: string;
+  description?: string;
+  credits: number;
+  fee: number;
+}) => {
+  return prisma.course.create({
+    data: {
+      code: data.code,
+      title: data.title,
+      description: data.description ?? null,
+      credits: data.credits,
+      fee: data.fee,
+    },
+  });
+};
+
+
 export const courseService = {
-  getAllCourses,
+  getAllCourses,createCourse
 };

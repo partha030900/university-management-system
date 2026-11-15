@@ -22,7 +22,7 @@ const app: Application = express();
 app.use(cors({
     origin: [
       "http://localhost:3000",
-      "https://university-management-frontend.vercel.app",
+      "https://university-management-frontend-sepia.vercel.app",
     ],
     credentials: true,
   })

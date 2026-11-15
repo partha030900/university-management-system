@@ -101,12 +101,15 @@ async function main() {
   where: {
     code: "CSE101",
   },
-  update: {},
+  update: {
+    fee : 100
+  },
   create: {
     code: "CSE101",
     title: "Introduction to Computer Science",
     description: "Fundamentals of computer science",
     credits: 3,
+    fee: 100,
   },
 });
 
@@ -114,12 +117,15 @@ const advancedCourse = await prisma.course.upsert({
   where: {
     code: "CSE201",
   },
-  update: {},
+  update: {
+    fee : 150
+  },
   create: {
     code: "CSE201",
     title: "Advanced Computer Science",
     description: "Advanced concepts in computer science",
     credits: 3,
+    fee: 100,
     prerequisites: {
       connect: {
         id: course.id,

@@ -93,6 +93,11 @@ if (pendingPayment) {
   }
 }
 
+console.log("Course payment details:", {
+  courseId: registration.section.course.id,
+  courseTitle: registration.section.course.title,
+  courseFee: registration.section.course.fee,
+});
   const amount = Number(registration.section.course.fee);
 
 if (!Number.isFinite(amount) || amount <= 0) {

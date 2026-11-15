@@ -16,7 +16,7 @@ router.post("/my-profile",authenticate,authorize("STUDENT"),validateRequest(crea
 
 router.get( "/my-profile",authenticate,authorize("STUDENT"),studentController.getMyStudentProfile);
 
-router.get("/programs",authenticate,authorize("STUDENT"),studentController.getAllPrograms);
+router.get("/programs",authenticate,authorize("STUDENT", "ADMIN"),studentController.getAllPrograms);
 
 router.get("/:id",authenticate,authorizeStudent,studentController.getStudentById);
 

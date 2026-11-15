@@ -1,7 +1,8 @@
 import { z } from "zod";
 
 export const createStudentSchema = z.object({
-  userId: z.number().int().positive(),
+  email: z.email(),
+  password: z.string().min(6),
   studentId: z.string().min(1),
   name: z.string().min(1),
   programId: z.number().int().positive(),
